@@ -1,0 +1,6 @@
+# expected is one section, name is irrelevant
+
+config settings anything
+	option checkInterval 13m  # interval is given in sleep command syntax
+	option domain "example.mooo.com"
+	option updateKey blabla
