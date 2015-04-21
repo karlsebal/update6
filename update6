@@ -1,6 +1,8 @@
 # expected is one section, name is irrelevant
+# option checkInterval is given in sleep syntax
+# see man sleep for info
 
 config settings anything
-	option checkInterval 13m  # interval is given in sleep command syntax
+	option checkInterval 13m  
 	option domain "example.mooo.com"
 	option updateKey blabla
