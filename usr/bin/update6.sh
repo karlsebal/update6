@@ -67,7 +67,7 @@ if [ -e /var/run/update6/update6.pid ]; then
 	rm /var/run/update6/update6.pid
 	
 	# is there such a process?
-	(ps | grep $pid | grep -v grep | grep "update6") && { 
+	[ -n "$(ps | grep $pid | grep -v grep | grep update6)" ] && { 
 		# kill it
 		kill $pid 2>/dev/null; $log killed running instance; } || { 
 		# something went wrong
