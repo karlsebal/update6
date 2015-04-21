@@ -72,7 +72,8 @@ if [ -e /var/run/update6/update6.pid ]; then
 		kill $pid 2>/dev/null; $log killed running instance; } || { 
 		# something went wrong
 		$log ERROR: pid and process do not match; }
-	
+elif [ "$1" = "stop" ]; then
+	$log cannot stop: no pid file: no instance running or bad error
 fi
 
 # we are clean now. letz stop here if requested
