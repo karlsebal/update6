@@ -7,7 +7,7 @@ EXTRA_COMMANDS="force"
 EXTRA_HELP="    force   force refresh"
 
 start() {
-        update6
+        update6 &
 }
 
 stop() {
@@ -16,5 +16,5 @@ stop() {
 
 
 force() {
-        update6 force
+        update6 force &
 }
