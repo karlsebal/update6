@@ -1,3 +1,6 @@
+# config-file for update6.sh
+# should be located in /etc/config
+
 # expected is one section, name is irrelevant
 # option checkInterval is given in sleep syntax
 # see man sleep for info
@@ -5,4 +8,4 @@
 config settings anything
 	option checkInterval 13m  
 	option domain "example.mooo.com"
-	option updateKey blabla
+	option updateKey mySecretUpdateKey
