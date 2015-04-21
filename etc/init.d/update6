@@ -1,0 +1,24 @@
+#!/bin/sh /etc/rc.common
+
+START=95
+STOP=50
+
+EXTRA_COMMANDS="force"
+EXTRA_HELP="    force   force refresh"
+
+start() {
+        update6
+}
+
+stop() {
+        if [ -f /var/run/update6/update6.pid ]; then
+                kill $(cat /var/run/update6/update6.pid)
+                rm -r /var/run/update6
+        else
+                echo ERROR: not running.
+        fi
+}
+
+force() {
+        update6 force
+}
