@@ -20,8 +20,9 @@ log="logger -t update6 "
 # extended regex, we call grep -E
 ip6regex="([0-9a-f]{0,4}:){2,7}[0-9a-f]{0,4}"
 
-# update forced?
+# update forced? set flag if so
 [ "$1" = "force" ] && { $log update forced; force=1; } || force=0
+
 
 # check for running instance
 
@@ -36,6 +37,10 @@ if [ -e /var/run/update6/update6.pid ]; then
 	$log killed running instance
 fi
 
+# we are clean now. letz stop here if requested
+[ "$1" = "stop" ] && exit;
+
+# okay, new PID
 echo "$$" > /var/run/update6/update6.pid
 
 

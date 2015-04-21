@@ -11,13 +11,9 @@ start() {
 }
 
 stop() {
-        if [ -f /var/run/update6/update6.pid ]; then
-                kill $(cat /var/run/update6/update6.pid)
-                rm -r /var/run/update6
-        else
-                echo ERROR: not running.
-        fi
+	update6 stop
 }
+
 
 force() {
         update6 force
