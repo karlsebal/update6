@@ -1,6 +1,6 @@
 #!/bin/sh
 
-## update goatfix.mooo.com
+## update freedns domain at afraid.org 
 
 # load config
 . /lib/functions.sh
@@ -14,11 +14,13 @@ loadSettings() {
 config_load update6
 config_foreach loadSettings settings
 
-log="logger -t goatfish.updater "
+# set command for comfortable logging
+log="logger -t update6 "
 
 # extended regex, we call grep -E
 ip6regex="([0-9a-f]{0,4}:){2,7}[0-9a-f]{0,4}"
 
+# update forced?
 [ "$1" = "force" ] && { $log update forced; force=1; } || force=0
 
 # check for running instance
@@ -42,9 +44,13 @@ get_current() {
 }
 
 get_registered() {
+	# dots in grepdomain need to be escaped
 	grepdomain=$(echo "$domain" | sed 's:\.:\\\.:g')
+
+	# fetch lookup
 	lookup=$(nslookup "$domain" 2>/dev/null | grep -A5 "Name:.*$grepdomain")
 	
+	# extract ipv6address
 	registered6addr=$(echo "$lookup" | grep -oE "$ip6regex")
 	
 	if [ -z "$registered6addr" ]; then
