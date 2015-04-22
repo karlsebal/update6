@@ -36,6 +36,10 @@ create_url() {
 create_call() {
 	create_url
 	call="curl $updateURL"
+
+	# do nothing if we got no ipv6 address
+	 [ -z "$current6addr" ] && { $log ERROR no ipv6 address obtained; call=":"; }
+
 }
 
 loadSettings() {
