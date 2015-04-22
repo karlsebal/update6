@@ -1,6 +1,6 @@
 #!/bin/sh
 
-[ "$ACTION" = "ifup" ] && [ "$INTERFACE" = "wan" ] && {
+[ "$ACTION" = "ifup" ] && [ "$INTERFACE" = "wan6" ] && {
         logger -t interface-hotplug "force update6"
         /etc/init.d/update6 force
 }
