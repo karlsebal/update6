@@ -106,6 +106,7 @@ while [ true ]; do
 		create_call
 		$log "updating $domain to $current6addr"
 		$log curl: $($call 2>/dev/null)
+		$force=0
 	else
 		$log "No change. No update."
 	fi
