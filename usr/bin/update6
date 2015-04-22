@@ -2,6 +2,11 @@
 
 ## update freedns domain at afraid.org 
 
+print_help() {
+	echo usage: "$0" {start|stop|force}
+	echo force will restart
+	exit
+}
 
 get_current() {
 	current6addr=$(ip -6 addr show eth0.2 | grep global\ dynamic | grep -oE "$ip6regex")
@@ -38,6 +43,8 @@ loadSettings() {
 	config_get updateKey "$1" updateKey
 }
 
+[ "$1" = "help" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ] && print_help
+
 
 # set command for comfortable logging
 log="logger -t update6 "
@@ -46,7 +53,7 @@ log="logger -t update6 "
 ip6regex="([0-9a-f]{0,4}:){2,7}[0-9a-f]{0,4}"
 
 # update forced? set flag if so
-[ "$1" = "force" ] && { $log update forced; force=1; } || force=0
+[ "$1" = "force-update" ] && { $log update forced; force=1; } || force=0
 
 
 # load config
@@ -68,6 +75,7 @@ if [ -e /var/run/update6/update6.pid ]; then
 	
 	# is there such a process?
 	[ -n "$(ps | grep $pid | grep -v grep | grep update6)" ] && { 
+		[ "$1" = "start" ] && { $log update6 already running; exit; }
 		# kill it
 		kill $pid 2>/dev/null; $log killed running instance; } || { 
 		# something went wrong
@@ -78,6 +86,10 @@ fi
 
 # we are clean now. letz stop here if requested
 [ "$1" = "stop" ] && exit;
+# or start ourself in demon mode if requested
+[ "$1" = "start" ] && { "$0" & exit; }
+# or with forced flag demon mode
+[ "$1" = "force" ] && { "$0" force-update & exit; }
 
 # okay, new PID
 echo "$$" > /var/run/update6/update6.pid
