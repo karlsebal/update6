@@ -1,10 +1,8 @@
 #!/bin/sh
 
-echo
-
-warn_pid="echo warning: pid file present!"
-warn_run="echo warning: update6 seems to run"
-advice="echo you should stop the service before install"
+warn_pid="echo -e \nwarning: pid file present!"
+warn_run="echo -e \nwarning: update6 seems to run"
+advice="echo -e you should stop the service before install\n"
 
 
 [ -z "$1" ] && action="help" || action="$1"
@@ -32,7 +30,5 @@ help)
    ;;
 
 esac
-
-echo
 
 exit 0
