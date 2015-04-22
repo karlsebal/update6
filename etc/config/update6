@@ -9,3 +9,4 @@ config settings anything
 	option checkInterval 13m  
 	option domain "example.mooo.com"
 	option updateKey mySecretUpdateKey
+	option enabled 0

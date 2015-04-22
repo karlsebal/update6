@@ -42,6 +42,7 @@ loadSettings() {
 	config_get checkInterval "$1" checkInterval
 	config_get domain "$1" domain
 	config_get updateKey "$1" updateKey
+	config_get enabled "$1" enabled
 }
 
 [ "$1" = "help" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ] && print_help
@@ -62,6 +63,9 @@ ip6regex="([0-9a-f]{0,4}:){2,7}[0-9a-f]{0,4}"
 
 config_load update6
 config_foreach loadSettings settings
+
+# service enabled?
+[ "${enabled:-1}" = "1" ] || { $log service disabled; exit; } 
 
 
 # check for running instance
