@@ -2,3 +2,5 @@ as for OpenWRT 14.07 BarrierBreaker, ddns-scripts cannot
 handle ipv6. this script updates a freedns-entry at afraid.com
 via the direct-update url. the config-file contains the neccessary
 informations and is located in /etc/config
+
+install via setup.sh
