@@ -1,4 +1,4 @@
-update6 -- ipv6 freedns updater for openwrt
+update6 -- ipv6 afraid.org freedns updater for openwrt
 
 as for OpenWRT 14.07 BarrierBreaker, ddns-scripts cannot
 handle ipv6. this script updates a freedns-entry at afraid.com
