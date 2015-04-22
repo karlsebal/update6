@@ -3,7 +3,7 @@
 ## update freedns domain at afraid.org 
 
 print_help() {
-	echo usage: "$0" {start|stop|force}
+	echo usage: "$0" "{start|stop|force}"
 	echo force will restart
 	exit
 }
