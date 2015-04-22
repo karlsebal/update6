@@ -80,9 +80,12 @@ if [ -e /var/run/update6/update6.pid ]; then
 		# kill it
 		kill $pid 2>/dev/null; $log killed running instance; } || { 
 		# something went wrong
-		$log ERROR: pid and process do not match; }
+		$log ERROR: pid and process do not match
+		$log use killall 
+		killall $(basename "$0"); }
 elif [ "$1" = "stop" ]; then
-	$log cannot stop: no pid file: no instance running or bad error
+	echo cannot stop: no pid file: no instance running or bad error
+	echo try \"killall $(basename $0)\"
 fi
 
 # we are clean now. letz stop here if requested
