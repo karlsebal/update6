@@ -4,17 +4,47 @@ START=95
 STOP=50
 
 EXTRA_COMMANDS="force"
-EXTRA_HELP="    force   force refresh"
+EXTRA_HELP="	force   force refresh"
 
+# set variables and return 1 if running, 0 otherwise
+checkForProc() {
+	# is there a pid file?
+	[ ! -e /var/run/update6.pid ] && return 0
+
+	# get pid
+	pid=$(cat /var/run/update6.pid 2>/dev/null)
+
+	# is there a matching process?
+	running=$(ps | grep $pid | grep update6)
+
+	[ -n "$running" ] && return 1 || return 0
+}
+
+		
 start() {
-        update6 start 
+	checkForProc
+	
+	[ $? -eq 1 ] && { echo "Instance running. Try stop first."; return 1; }
+	
+	/usr/bin/update6 >/dev/null &
+	return 0
 }
 
 stop() {
-	update6 stop
+	checkForProc
+
+	[ $? -eq 0 ] && { echo no instance running; return 0; }
+
+	kill $pid
+	return $?
 }
 
 
 force() {
-        update6 force 
+	checkForProc
+
+	[ $? -eq 0 ] && { echo service not running; return 1; }
+
+	kill -hup $pid
+	return $?
 }

@@ -2,12 +2,58 @@
 
 ## update freedns domain at afraid.org 
 
+# set command for comfortable logging
+log="logger -t update6 "
+
+# extended regex, we call grep -E
+ip6regex="([0-9a-f]{0,4}:){2,7}[0-9a-f]{0,4}"
+
+# we need a variable for the sleep process
+# so we can cleanup that as well when exit
+unset sleepid
+
+# lets have something to check whether
+# update was forced
+unset forced
+
+# help message
 print_help() {
 	echo usage: "$0" "{start|stop|force}"
-	echo force will restart
 	echo use logread to check output
 	exit
 }
+
+# cleanup when caught signal 
+cleanup() {
+	# remove pid file
+	[ -e /var/run/update6.pid ] && rm /var/run/update6.pid >/dev/null 2>&1 || $log "Error: No pid file."
+	# kill sleep
+	[ $sleepid ] && kill $sleepid
+
+	$log terminating..
+}
+
+die(){
+	cleanup
+	exit
+}
+
+diehard() {
+	cleanup
+	trap - int
+	kill -int $$
+}
+
+forceUpdate() {
+	get_current
+	do_update
+	forced=1
+}
+
+trap die TERM
+trap diehard INT
+trap forceUpdate HUP
+
 
 get_current() {
 	current6addr=$(ip -6 addr show eth0.2 | grep global\ dynamic | grep -oE "$ip6regex")
@@ -35,11 +81,18 @@ create_url() {
 
 create_call() {
 	create_url
-	call="curl $updateURL"
+	call="curl -s $updateURL"
 
 	# do nothing if we got no ipv6 address
 	 [ -z "$current6addr" ] && { $log ERROR no ipv6 address obtained; call=":"; }
 
+}
+
+# updates with ip address obtained by get_current
+do_update() {
+		create_call
+		$log "updating $domain"
+		$log "curl: $($call 2>&1)"
 }
 
 loadSettings() {
@@ -52,75 +105,35 @@ loadSettings() {
 [ "$1" = "help" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ] && print_help
 
 
-# set command for comfortable logging
-log="logger -t update6 "
-
-# extended regex, we call grep -E
-ip6regex="([0-9a-f]{0,4}:){2,7}[0-9a-f]{0,4}"
-
-# update forced? set flag if so
-[ "$1" = "force-update" ] && { $log update forced; force=1; } || force=0
-
-
 # load config
 . /lib/functions.sh
 
 config_load update6
 config_foreach loadSettings settings
 
-# service enabled?
-[ "${enabled:-1}" = "1" ] || { $log service disabled; exit; } 
+# service enabled? default is yes.
+[ "${enabled:-1}" = "1" ] || { $log service disabled; exit 0; } 
 
-
-# check for running instance
-
-if [ ! -d /var/run/update6 ]; then
-	mkdir /var/run/update6
-fi
-
-if [ -e /var/run/update6/update6.pid ]; then
-	pid=$(cat /var/run/update6/update6.pid)
-	rm /var/run/update6/update6.pid
-	
-	# is there such a process?
-	[ -n "$(ps | grep $pid | grep -v grep | grep update6)" ] && { 
-		[ "$1" = "start" ] && { $log update6 already running; exit; }
-		# kill it
-		kill $pid 2>/dev/null; $log killed running instance; } || { 
-		# something went wrong
-		$log ERROR: pid and process do not match
-		$log use killall 
-		killall $(basename "$0"); }
-elif [ "$1" = "stop" ]; then
-	echo cannot stop: no pid file: no instance running or bad error
-	echo try \"killall $(basename $0)\"
-fi
-
-# we are clean now. letz stop here if requested
-[ "$1" = "stop" ] && exit;
-# or start ourself in demon mode if requested
-[ "$1" = "start" ] && { "$0" & exit; }
-# or with forced flag demon mode
-[ "$1" = "force" ] && { "$0" force-update & exit; }
-
-# okay, new PID
-echo "$$" > /var/run/update6/update6.pid
+# new PID
+echo "$$" > /var/run/update6.pid
 
 # main loop
 while [ true ]; do
+	# if forced just unset var and go back to sleep
+	[ $forced ] && unset forced || {
+		get_current
+		get_registered
 
-	get_current
-	get_registered
+		if [ "$current6addr" != "$registered6addr" ]; then
+			do_update
+		else
+			$log "No change. No update."
+		fi
 
+		sleep $checkInterval &
+		sleepid=$!
+	}	
 
-	if [ $force -ne 0 ] || [ "$current6addr" != "$registered6addr" ]; then
-		create_call
-		$log "updating $domain to $current6addr"
-		$log curl: $($call 2>/dev/null)
-		force=0
-	else
-		$log "No change. No update."
-	fi
-
-	sleep $checkInterval
+	wait
+	unset sleepid
 done
