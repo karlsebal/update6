@@ -10,7 +10,7 @@ advice="echo -e you should stop the service before install\n"
 case "$action" in
 
   install)
-	[ -f /var/run/update6/update6.pid ] && { $warn_pid; $advice; exit; }
+	[ -f /var/run/update6.pid ] && { $warn_pid; $advice; exit; }
 	[ -n "$(ps | grep update6 | grep -v grep)" ] && { $warn_run; $advice; exit; }
 	cp -i etc/config/update6 /etc/config/
 	cp -i etc/init.d/update6 /etc/init.d/
