@@ -14,7 +14,7 @@ case "$action" in
 	[ -n "$(ps | grep update6 | grep -v grep | grep -v $$)" ] && { $warn_run; $advice; exit; }
 	cp -i etc/config/update6 /etc/config/
 	cp -i etc/init.d/update6 /etc/init.d/
-	cp -i etc/hotplug.d/iface/25-update6 /etc/hotplug.d/iface/25-update6
+	cp -i etc/hotplug.d/iface/25-update6 /etc/hotplug.d/iface/
 	cp -i usr/bin/update6 /usr/bin/
    ;;
 
